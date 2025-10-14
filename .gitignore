@@ -1,0 +1,28 @@
+# macOS / editors
+.DS_Store
+.vscode/
+.idea/
+*.swp
+
+# Debug helpers (never deploy)
+public/check.php
+scripts/
+templates/
+.DS_Store
+
+# Logs
+*.log
+
+# Node/Front-end (for future React/Vite projects under /projects/*)
+**/node_modules/
+**/dist/
+**/build/
+*.map
+.env
+.env.*
+**/.env
+**/.env.*
+
+# PHP Composer (if you ever use it in a project)
+vendor/
+composer.lock
