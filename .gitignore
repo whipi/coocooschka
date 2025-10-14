@@ -26,3 +26,7 @@ templates/
 # PHP Composer (if you ever use it in a project)
 vendor/
 composer.lock
+
+# local-only fallbacks
+config/
+data/
