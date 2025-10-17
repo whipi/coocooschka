@@ -30,7 +30,7 @@ jobs:
           password: ${{ secrets.NC_FTP_PASS }}
           protocol: ftps
           # Deploy only the public web files
-          local-dir: ./public
+          local-dir: ./public/
           # Upload them into your site's document root
           server-dir: coocooschka.de/httpdocs/
           exclude: |
