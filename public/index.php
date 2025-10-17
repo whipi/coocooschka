@@ -1,15 +1,20 @@
 <?php
-// Load config (prod first, then local) robustly
-$docroot    = rtrim($_SERVER['DOCUMENT_ROOT'] ?? dirname(__DIR__), '/');
-$prodConfig = $docroot . '/private/config/config.php';
-$devConfig  = __DIR__ . '/../config/config.php';
+// Robust config loader: prod (DOCUMENT_ROOT) → prod (relative) → local dev
+$docroot = rtrim($_SERVER['DOCUMENT_ROOT'] ?? '', '/');
 
-if (is_readable($prodConfig)) {
-  require $prodConfig;
-} elseif (@is_readable($devConfig)) { // suppress open_basedir warning for local fallback
-  require $devConfig;
-} else {
-  error_log('Config not found. Tried: ' . $prodConfig . ' and ' . $devConfig);
+$candidates = array_filter([
+  $docroot ? $docroot . '/private/config/config.php' : null, // /httpdocs/private/...
+  __DIR__ . '/../private/config/config.php',                 // relative prod fallback
+  __DIR__ . '/../config/config.php',                        // local dev
+]);
+
+$loaded = false;
+foreach ($candidates as $p) {
+  if (is_readable($p)) { require $p; $loaded = true; break; }
+}
+
+if (!$loaded) {
+  error_log('Config not found. Tried: ' . implode(' | ', $candidates));
   http_response_code(500);
   echo 'Config not found.';
   exit;

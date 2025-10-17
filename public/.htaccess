@@ -1,17 +1,38 @@
-# Force HTTPS (prod)
-RewriteEngine On
-RewriteCond %{HTTPS} !=on
-RewriteRule ^ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
+# Serve index.php on "/"
+DirectoryIndex index.php
 
-# Security headers
+RewriteEngine On
+
+# 1) Canonical host for the apex (example: force exactly coocooschka.de)
+#    If you don't want a canonical host here, remove this block.
+RewriteCond %{HTTP_HOST} !^coocooschka\.de$ [NC]
+RewriteRule ^ https://coocooschka.de%{REQUEST_URI} [R=301,L]
+
+# 2) Force HTTPS (but don't loop behind proxy)
+RewriteCond %{HTTPS} !=on
+RewriteCond %{HTTP:X-Forwarded-Proto} !https
+RewriteRule ^ https://%{HTTP_HOST}%{REQUEST_URI} [R=301,L]
+
+# Security & privacy headers
 <IfModule mod_headers.c>
   Header always set X-Frame-Options "SAMEORIGIN"
   Header always set X-Content-Type-Options "nosniff"
   Header always set Referrer-Policy "no-referrer-when-downgrade"
-  Header always set Content-Security-Policy "default-src 'self'; img-src 'self' data:; style-src 'self' 'unsafe-inline';"
   Header always set X-Robots-Tag "noindex, nofollow, noarchive, nosnippet"
-  # Optional: enable HSTS after SSL works (be careful—locks to HTTPS)
-  # Header always set Strict-Transport-Security "max-age=31536000; includeSubDomains; preload"
+  Header always set Content-Security-Policy "default-src 'self'; base-uri 'self'; form-action 'self'; frame-ancestors 'self'; script-src 'self'; connect-src 'self'; img-src 'self' data:; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com data:;"
 </IfModule>
 
-DirectoryIndex index.php
+# -------------------------------------------------
+# React / Vite Single Page Application routing
+# -------------------------------------------------
+# If a requested file or folder doesn't exist,
+# serve index.html so the React router can handle the route.
+<IfModule mod_rewrite.c>
+  RewriteEngine On
+  RewriteBase /
+  RewriteCond %{REQUEST_FILENAME} -f [OR]
+  RewriteCond %{REQUEST_FILENAME} -d
+  RewriteRule ^ - [L]
+  RewriteRule . /index.html [L]
+</IfModule>
+# -------------------------------------------------

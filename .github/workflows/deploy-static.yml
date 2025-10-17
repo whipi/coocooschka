@@ -1,0 +1,58 @@
+# .github/workflows/deploy-react.yml
+name: Deploy – React (Vite Build + FTP)
+
+on:
+  push:
+    branches: [ main ]
+  workflow_dispatch:
+
+concurrency:
+  group: deploy-react-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build Vite project
+        env:
+          VITE_API_URL: ${{ secrets.VITE_API_URL }}   # optional for Supabase URLs etc.
+        run: npm run build
+
+      - name: Upload build artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: vite-dist
+          path: dist
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          name: vite-dist
+          path: dist
+
+      - name: Deploy via FTPS
+        uses: SamKirkland/FTP-Deploy-Action@v4
+        with:
+          server: ${{ secrets.NC_FTP_HOST }}
+          username: ${{ secrets.NC_FTP_USER }}
+          password: ${{ secrets.NC_FTP_PASS }}
+          protocol: ftps
+          local-dir: ./dist
+          server-dir: /coocooschka/httpdocs/    # <-- change to your Netcup path, must end with /
+          exclude: |
+            **/.git*
+            **/.github/**
+            **/node_modules/**
