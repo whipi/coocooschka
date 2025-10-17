@@ -82,7 +82,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <input type="hidden" name="next" value="<?= htmlspecialchars($next) ?>">
     <input type="hidden" name="csrf" value="<?= htmlspecialchars(csrf_token()) ?>">
 
-    <button type="submit">Login</button>
+    <button type="submit">Loginnn</button>
   </form>
 </body>
 </html>
