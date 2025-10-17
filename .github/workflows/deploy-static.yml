@@ -15,37 +15,23 @@ concurrency:
 jobs:
   deploy:
     runs-on: ubuntu-latest
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Deploy /public → /coocooschka.de/httpdocs
+      - name: Deploy via FTPS to netcup
         uses: SamKirkland/FTP-Deploy-Action@v4.3.5
         with:
-          server: ${{ secrets.NC_FTP_HOST }}   # use IPv4 if FTPS over IPv6 is flaky
+          server: 91.204.46.169            # ✅ same as in Cyberduck
+          port: 21                         # ✅ same
+          protocol: ftps                   # ✅ same ("FTP-SSL (Explicit AUTH TLS)")
           username: ${{ secrets.NC_FTP_USER }}
           password: ${{ secrets.NC_FTP_PASS }}
-          protocol: ftps
-          port: 21
-          local-dir: ./public/                      # must end with /
-          server-dir: /coocooschka.de/httpdocs/     # must end with /
-          exclude: |
-            **/.git*
-            **/.github/**
-            **/.DS_Store
-            **/node_modules/**
-            **/README.md
-
-      - name: Deploy /private → /coocooschka.de/private
-        uses: SamKirkland/FTP-Deploy-Action@v4.3.5
-        with:
-          server: ${{ secrets.NC_FTP_HOST }}
-          username: ${{ secrets.NC_FTP_USER }}
-          password: ${{ secrets.NC_FTP_PASS }}
-          protocol: ftps
-          port: 21
-          local-dir: ./private/
-          server-dir: /coocooschka.de/private/
+          local-dir: ./public/             # ✅ must end with /
+          server-dir: /coocooschka.de/httpdocs/  # ✅ same as your Cyberduck path
+          timeout: 300000
+          log-level: verbose
           exclude: |
             **/.git*
             **/.github/**
