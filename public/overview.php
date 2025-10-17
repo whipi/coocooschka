@@ -47,7 +47,7 @@ if ($projectsFile && is_readable($projectsFile)) {
 </head>
 <body>
   <header class="topbar">
-    <h1>Vibe Projects</h1>
+    <h1>My Vibe Projects</h1>
     <nav><a href="/logout.php" class="btn-secondary">Logout</a></nav>
   </header>
 
