@@ -1,4 +1,4 @@
-name: Deploy – Static Site (FTP)
+name: Deploy – Static Site (FTPS)
 
 on:
   push:
@@ -7,7 +7,7 @@ on:
     paths-ignore:
       - "**.md"
       - ".github/**"
-  # Optional: manual trigger
+  # Optional: allow manual run from GitHub UI
   workflow_dispatch:
 
 concurrency:
@@ -17,27 +17,25 @@ concurrency:
 jobs:
   deploy:
     runs-on: ubuntu-latest
+
     steps:
-      - name: Checkout
+      - name: Checkout code
         uses: actions/checkout@v4
 
-      # If your site is in ./public, set local-dir: ./public
-      # If your site is at repo root, set local-dir: ./
-      - name: Deploy via FTPS
+      - name: Deploy via FTPS to netcup
         uses: SamKirkland/FTP-Deploy-Action@v4.3.5
         with:
           server: ${{ secrets.NC_FTP_HOST }}
           username: ${{ secrets.NC_FTP_USER }}
           password: ${{ secrets.NC_FTP_PASS }}
           protocol: ftps
-          local-dir: ./         # ⟵ change to ./ if your site is at the repo root
-          server-dir: /coocooschka.de/httpdocs/   # ⟵ change to your target directory
+          # Deploy only the public web files
+          local-dir: ./public
+          # Upload them into your site's document root
+          server-dir: coocooschka.de/httpdocs/
           exclude: |
             **/.git*
             **/.github/**
             **/.DS_Store
             **/node_modules/**
             **/README.md
-          # Optional safety levers:
-          #dry-run: true # first time, preview what would upload
-          # dangerous-clean-slate: true # wipes server-dir before upload (careful!)
