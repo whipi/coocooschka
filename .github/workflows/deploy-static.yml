@@ -39,5 +39,5 @@ jobs:
             **/node_modules/**
             **/README.md
           # Optional safety levers:
-          dry-run: true # first time, preview what would upload
+          #dry-run: true # first time, preview what would upload
           # dangerous-clean-slate: true # wipes server-dir before upload (careful!)
