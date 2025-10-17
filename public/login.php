@@ -64,7 +64,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 </head>
 <body class="center">
   <form class="card" method="post" action="/login.php" autocomplete="on">
-    <h1>Login</h1>
+    <h1>LoginNNN</h1>
 
     <?php if ($error): ?>
       <div class="alert"><?= htmlspecialchars($error) ?></div>
@@ -82,7 +82,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <input type="hidden" name="next" value="<?= htmlspecialchars($next) ?>">
     <input type="hidden" name="csrf" value="<?= htmlspecialchars(csrf_token()) ?>">
 
-    <button type="submit">Loginnn</button>
+    <button type="submit">Login</button>
   </form>
 </body>
 </html>
