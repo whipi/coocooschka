@@ -64,7 +64,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 </head>
 <body class="center">
   <form class="card" method="post" action="/login.php" autocomplete="on">
-    <h1>LoginNNN</h1>
+    <h1>LogiN</h1>
 
     <?php if ($error): ?>
       <div class="alert"><?= htmlspecialchars($error) ?></div>
