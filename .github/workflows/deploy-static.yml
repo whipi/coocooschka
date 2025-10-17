@@ -1,58 +1,43 @@
-# .github/workflows/deploy-react.yml
-name: Deploy – React (Vite Build + FTP)
+name: Deploy – Static Site (FTP)
 
 on:
   push:
     branches: [ main ]
+    # Avoid running for docs/config changes only
+    paths-ignore:
+      - "**.md"
+      - ".github/**"
+  # Optional: manual trigger
   workflow_dispatch:
 
 concurrency:
-  group: deploy-react-${{ github.ref }}
+  group: deploy-static-${{ github.ref }}
   cancel-in-progress: true
 
 jobs:
-  build:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
-        with:
-          node-version: 20
-          cache: 'npm'
-
-      - name: Install dependencies
-        run: npm ci
-
-      - name: Build Vite project
-        env:
-          VITE_API_URL: ${{ secrets.VITE_API_URL }}   # optional for Supabase URLs etc.
-        run: npm run build
-
-      - name: Upload build artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: vite-dist
-          path: dist
-
   deploy:
-    needs: build
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/download-artifact@v4
-        with:
-          name: vite-dist
-          path: dist
+      - name: Checkout
+        uses: actions/checkout@v4
 
+      # If your site is in ./public, set local-dir: ./public
+      # If your site is at repo root, set local-dir: ./
       - name: Deploy via FTPS
-        uses: SamKirkland/FTP-Deploy-Action@v4
+        uses: SamKirkland/FTP-Deploy-Action@v4.3.5
         with:
           server: ${{ secrets.NC_FTP_HOST }}
           username: ${{ secrets.NC_FTP_USER }}
           password: ${{ secrets.NC_FTP_PASS }}
           protocol: ftps
-          local-dir: ./dist
-          server-dir: /coocooschka/httpdocs/    # <-- change to your Netcup path, must end with /
+          local-dir: ./         # ⟵ change to ./ if your site is at the repo root
+          server-dir: /coocooschka.de/httpdocs/   # ⟵ change to your target directory
           exclude: |
             **/.git*
             **/.github/**
+            **/.DS_Store
             **/node_modules/**
+            **/README.md
+          # Optional safety levers:
+          dry-run: true # first time, preview what would upload
+          # dangerous-clean-slate: true # wipes server-dir before upload (careful!)
